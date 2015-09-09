@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>多数据源的面积图</title>
+		<meta name="Description" content="" />
+		<meta name="Keywords" content="" />
+		<script type="text/javascript" src="ichart-1.0.beta.min.js"></script>
+		<script type="text/javascript" >
+		    $(function(){	
+		    	var data = new Array();
+		        var data_labels = new Array();
+				var contact = window.mainActivity.getContact();
+				var contact_lab = window.mainActivity.getContactLabels();
+				eval('data='+contact);
+				window.mainActivity.debugOut("data="+data); 
+				eval('data_labels='+window.mainActivity.getContactLabels());
+				window.mainActivity.debugOut("data_labels="+data_labels); 
+				
+				new iChart.Area2D({
+					render : 'canvasDiv',
+					data: data,
+					width : 800,
+					height : 400,
+					legend : {
+						enable : true
+					},
+					tip:{
+						enable : true
+					},
+					listeners:{
+						parseTipText:function(d,t,i){
+							return data_labels[i]+"份平均温度:"+t+"℃";
+						}
+					},
+					coordinate:{
+						scale:[{
+							 position:'left',	
+							 start_scale:0,
+							 end_scale:40,
+							 scale_space:5,
+							 listeners:{
+								parseText:function(t,x,y){
+									return {text:t+"℃"}
+								}
+							}
+						},{
+							 position:'bottom',	
+							 start_scale:1,
+							 end_scale:12,
+							 parseText:function(t,x,y){
+								return {textY:y+10}
+							 },
+							 labels:data_labels
+						}]
+					}
+				}).draw();
+			});
+		</script>
+	</head>
+	<body >
+		<div id='canvasDiv'>
+		</div>
+	</body>
+</html>

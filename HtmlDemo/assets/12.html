@@ -1,0 +1,209 @@
+<html>  
+ <head>  
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>  
+  <title>DIV+CSS</title>  
+ 
+<style type="text/css">  
+div{  
+	width:300px;  
+	height:300px;  
+}  
+.div1{   
+	position:absolute;  
+	left:0px;  
+	top:0px;
+	width:800px;
+	height:200px;    
+}  
+.div2{  
+	background:red;
+	position:absolute;  
+	left:0px;  
+	top:200px;
+	width:400px;
+	height:200px;  
+}
+.div3{  
+	background:blue;
+	position:absolute;  
+	left:400px;  
+	top:200px;
+	width:400px;
+	height:200px;  
+}
+.btn{
+	position:absolute;  
+	left:800px;  
+	top:0px;
+	width:100px;
+	height:100px;
+}
+</style> 
+<script type="text/javascript" src="ichart.1.2.min.js"></script>
+<script type="text/javascript" >
+$(function(){
+	initFirDiv();
+	initSecDiv();
+	initThrDiv();
+});
+
+
+
+
+
+function initFirDiv(){
+	var data = new Array();
+	var contact = window.column2DOne.getData(); //获得数据
+	eval('data='+contact); //执行数据的赋值
+	window.mainActivity.debugOut(data); 
+
+	var title = window.column2DOne.getTitle(); //获得标题
+	var width = window.column2DOne.getWidth(); //获得宽度
+	var height = window.column2DOne.getHeight(); //获得高度
+	window.mainActivity.debugOut(title);
+	window.mainActivity.debugOut(width);
+	window.mainActivity.debugOut(height);
+		        	
+new iChart.Column2D({
+	render : 'canvasDiv1',
+	data: data,
+	title : title,
+	showpercent:true,
+	decimalsnum:2,
+	width : width,
+	height : height,
+	coordinate:{
+		background_color:'#fefefe',
+		scale:[{
+			position:'left',	
+			start_scale:0,
+			end_scale:40,
+			scale_space:8,
+			listeners:{
+				parseText:function(t,x,y){
+					return {text:t+"%"}
+				}
+			}
+		}]
+	}
+}).draw();
+}
+
+function initSecDiv(){
+	var data = new Array();
+	var contact = window.column2DTwo.getData(); //获得数据
+	eval('data='+contact); //执行数据的赋值
+	window.mainActivity.debugOut(data); 
+
+	var title = window.column2DTwo.getTitle(); //获得标题
+	var width = window.column2DTwo.getWidth(); //获得宽度
+	var height = window.column2DTwo.getHeight(); //获得高度
+	window.mainActivity.debugOut(title);
+	window.mainActivity.debugOut(width);
+	window.mainActivity.debugOut(height);		        	
+new iChart.Column2D({
+	render : 'canvasDiv2',
+	data: data,
+	title : title,
+	showpercent:true,
+	decimalsnum:2,
+	width : width,
+	height : height,
+	coordinate:{
+		background_color:'#fefefe',
+		scale:[{
+			position:'left',	
+			start_scale:0,
+			end_scale:40,
+			scale_space:8,
+			listeners:{
+				parseText:function(t,x,y){
+					return {text:t+"%"}
+				}
+			}
+		}]
+	}
+}).draw();
+}
+
+function initThrDiv(){
+	var data = new Array();
+	var contact = window.donut2DOne.getData(); //获得数据
+	eval('data='+contact); //执行数据的赋值
+	window.mainActivity.debugOut(data); 
+
+	var title = window.donut2DOne.getTitle(); //获得标题
+	var width = window.donut2DOne.getWidth(); //获得宽度
+	var height = window.donut2DOne.getHeight(); //获得高度
+	var radius = window.donut2DOne.getRadius(); //获得半径
+	window.mainActivity.debugOut(title);
+	window.mainActivity.debugOut(width);
+	window.mainActivity.debugOut(height);
+	window.mainActivity.debugOut(radius);
+	var chart = new iChart.Donut2D({
+		render : 'canvasDiv3',
+		data: data,
+		title : title,
+		sub_option : {
+			label : {
+				background_color:null,
+				sign:false,//设置禁用label的小图标
+				padding:'0 4',
+				border:{
+					enable:false,
+					color:'#666666'
+				},
+				fontsize:11,	
+				fontweight:600,
+				color : '#4572a7'
+			},
+			border : {
+				width : 2,
+				color : '#ffffff'
+			}
+		},
+		shadow : true,
+		shadow_blur : 6,
+		shadow_color : '#aaaaaa',
+		shadow_offsetx : 0,
+		shadow_offsety : 0,
+		background_color:'#fefefe',
+		offset_angle:-120,//逆时针偏移120度
+		showpercent:false,
+		decimalsnum:2,
+		width : width,
+		height : height,
+		radius:radius,
+  	}).draw();
+}
+
+</script> 
+<script type="text/javascript">
+function updateFirDiv(){
+	window.mainActivity.updateColumn2DOne();
+	initFirDiv();
+}
+function updateSecDiv(){
+	window.mainActivity.updateColumn2DTwo();
+	initSecDiv();
+}
+function updateThrDiv(){
+	window.mainActivity.updateDonut2DOne();
+	initThrDiv();
+}
+</script>
+</head>  
+<body>  
+
+<div id='canvasDiv1' class="div1"></div>
+
+<div id='button1' class="btn">
+	<input type="button" value="Button1" onClick="updateFirDiv()" >
+	<input type="button" value="Button2" onClick="updateSecDiv()" >
+	<input type="button" value="Button3" onClick="updateThrDiv()" >
+</div>
+  
+<div id='canvasDiv2' class="div2"></div>
+<div id='canvasDiv3' class="div3"></div>  
+</body>  
+</html>

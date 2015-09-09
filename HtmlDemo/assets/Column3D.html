@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>3D柱形图</title>
+		<meta name="Description" content="" />
+		<meta name="Keywords" content="" />
+		<script type="text/javascript" src="ichart-1.0.beta.min.js"></script>
+		<script type="text/javascript" >
+		
+		$(function(){
+			var data = new Array();
+			var contact = window.mainActivity.getContact();
+			eval('data='+contact);
+			window.mainActivity.debugOut(data); 
+	
+	        var width = window.chart.getWidth();
+	        var height = window.chart.getHeight();
+	        var title = window.chart.getTitle();
+	        window.mainActivity.debugOut(title);
+	        
+			new iChart.Column3D({
+				render : 'canvasDiv',
+				data: data,
+				title : title,
+				width : width,
+				height : height,
+				coordinate:{
+					scale:[{
+						 position:'left',	
+						 start_scale:0,
+						 end_scale:40,
+						 scale_space:5
+					}]
+				}
+			}).draw();
+		});
+		</script>
+	</head>
+	<body >
+		<div id='canvasDiv'>
+		</div>
+	</body>
+</html>
