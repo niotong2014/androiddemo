@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">filedowndemo</string>
+    <string name="action_settings">Settings</string>
+    <string name ="creatFile">生成文件</string>
+    <string name ="delFile">删除文件</string>
+    <string name="isFileExist">文件是否存在</string>
+    <string name ="creatDir">生成文件夹</string>
+    <string name ="delDir">删除文件夹</string>
+    <string name ="isDirExist">文件夹是否存在</string>
+    <string name = "downFile">下载文件</string>
+
+</resources>

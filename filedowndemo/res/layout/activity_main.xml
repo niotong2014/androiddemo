@@ -1,0 +1,48 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/btCreatFile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/creatFile" />
+
+    <Button
+        android:id="@+id/btDelFile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/delFile" />
+
+    <Button
+        android:id="@+id/btIsFileExist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/isFileExist" />
+
+    <Button
+        android:id="@+id/btCreatDir"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/creatDir" />
+
+    <Button
+        android:id="@+id/btDelDir"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/delDir" />
+
+    <Button
+        android:id="@+id/btIsDirExist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/isDirExist" />
+
+    <Button
+        android:id="@+id/btDownFile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/downFile" />
+
+</LinearLayout>
