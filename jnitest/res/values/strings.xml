@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">jnitest</string>
+    <string name="action_settings">Settings</string>
+    <string name="settext">设置文字</string>
+    <string name="setbt">设置</string>
+    <string name="gettext">获取文字</string>
+    <string name="getbt">获取</string>
+
+</resources>
