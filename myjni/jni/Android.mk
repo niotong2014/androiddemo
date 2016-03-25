@@ -20,7 +20,7 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_MODULE_TAGS := eng
+LOCAL_MODULE_TAGS := samples
 
 # This is the target being built.
 LOCAL_MODULE:= libJniTest
@@ -28,7 +28,7 @@ LOCAL_MODULE:= libJniTest
 
 # All of the source files that we will compile.
 LOCAL_SRC_FILES:= \
-  com_niotong_tester_JniTest.cpp
+  native.cpp
 
 # All of the shared libraries we link against.
 LOCAL_SHARED_LIBRARIES := \

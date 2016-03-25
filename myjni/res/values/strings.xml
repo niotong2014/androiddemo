@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">myjni</string>
+    <string name="action_settings">Settings</string>
+    <string name="plus">"+"</string>
+    <string name="equals">"="</string>
+    <string name="defaultzero">0</string>
+    <string name="dojni">执行jni</string>
+
+</resources>
