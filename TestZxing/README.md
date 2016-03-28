@@ -1,0 +1,2 @@
+使用zxing开源库完成根据mac地址生成条形码
+email:niotong2014@sina.com
