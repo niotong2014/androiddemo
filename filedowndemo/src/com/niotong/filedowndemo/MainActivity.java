@@ -37,6 +37,7 @@ public class MainActivity extends Activity implements OnClickListener{
 	
 	public String FILE_NAME = "niotongyuan";
 	public String DIR_NAME = "niotongdir";
+	//网络上找的一个图片地址
 	public String FILE_URL = "http://upload.cbg.cn/2015/1126/1448517087148.jpg";
 	
 	File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS+"/yuan");
