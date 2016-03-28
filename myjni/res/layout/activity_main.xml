@@ -66,4 +66,11 @@
         android:layout_height="50dp"
         android:text="@string/dojni" />
 
+        <EditText
+            android:id="@+id/editText3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textMultiLine" />
+      
 </LinearLayout>

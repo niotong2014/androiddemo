@@ -61,7 +61,7 @@ public class MainActivity extends Activity implements OnClickListener{
 	}
 	private void doJNI() {
 		// TODO Auto-generated method stub
-		JniTest.doJNI();
+		JniTest.doJNI(this);
 	}
 	private void useJNItoAdd(){
 		double a = 0, b = 0, c = 0;
