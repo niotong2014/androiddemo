@@ -33,16 +33,6 @@ public class MainActivity extends Activity implements OnClickListener{
         equalsButton.setOnClickListener(this);
         dojniButton.setOnClickListener(this);
     }
-    /**
-     * 
-     * @param b
-     * @return
-     */
-    public double getValue(double b){
-    	double a = 0;
-    	a = b + 1.0;
-    	return a;
-    }
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
