@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">AIDLDemoClient</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+	<string name="num_1">NUM 1</string>
+	<string name="num_2">NUM 2</string>
+	<string name="bindStr">bind</string>
+	<string name="unbindStr">unbind</string>
+	<string name="calbtStr">calculate</string>
+	<string name="resultStr">result is：</string>
+	<string name = "defvalue">1.0</string>
+</resources>
