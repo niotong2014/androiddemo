@@ -1,0 +1,1 @@
+android-serialport-api 该项目放在android4.4源码中不能编译成功（主要是jni不能编译成功，需要自行修改），但是可以通过eclipse编译成功
