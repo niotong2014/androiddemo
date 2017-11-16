@@ -50,7 +50,7 @@ public class OcocciService extends Service {
 	Map<String,String> mIPInfoMap = new HashMap<String,String>();
 	
 	private EthernetManager mEthManager;
-	private EthernetDevInfo mInterfaceInfo;
+	private EthernetDevInfo mInterfaceInfo = new EthernetDevInfo();
 	private List<EthernetDevInfo> mListDevices = new ArrayList<EthernetDevInfo>();
 	
 	private static final String TAG = "niotongyuan_SerialPortService";
@@ -74,19 +74,7 @@ public class OcocciService extends Service {
 	public void onCreate(){
 		LOG("Service onCreate");
 		super.onCreate();
-		mEthManager = EthernetManager.getInstance();
-		mListDevices = mEthManager.getDeviceNameList();
-		for(EthernetDevInfo deviceinfo : mListDevices){
-			if(!deviceinfo.getIfName().equals("eth0")){
-			//	tmpPreference = new EthPreference(getActivity(), deviceinfo);
-			//	mSelected = tmpPreference;
-			}else{
-//				mInterfaceInfo.setHwaddr(deviceinfo.getHwaddr());
-				mInterfaceInfo = deviceinfo;
-				LOG("IfName = " + deviceinfo.getIfName());
-			//	upEthdevice = new EthPreference(getActivity(), DevIfo);
-			}
-		}
+		IPInit();
 	
 		try {
 			mSerialPort = new SerialPort(new File("/dev/ttyS2"), 115200, 0);
@@ -182,7 +170,67 @@ public class OcocciService extends Service {
 		setIP();
 		getIP();
 	}
-	
+	private void IPInit(){
+		LOG("---------mark1");
+		mEthManager = EthernetManager.getInstance();
+		if(mEthManager.getState() == EthernetManager.ETHERNET_STATE_ENABLED){
+			LOG("ethernet is enabled");
+		}else{
+			LOG("ethernet is disabled");
+			/*
+			try{
+				mInterfaceInfo.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
+				mEthManager.updateDevInfo(mInterfaceInfo);
+				mEthManager.setEnabled(true);
+				Thread.sleep(500);
+			}catch(Exception e){
+				LOG("set ethernet enable fail");
+			}
+			*/
+		}
+		LOG("getTotalInterface = "+mEthManager.getTotalInterface());
+		LOG("---------mark2");
+		if(mEthManager.isConfigured()){
+			LOG("ethernet is configured");
+		}else{
+			LOG("ethernet is not configured");
+		}
+		LOG("---------mark3");
+		mInterfaceInfo = mEthManager.getSavedConfig();
+		LOG("---------mark4");
+		if(mInterfaceInfo == null){
+			LOG("mInterfaceInfo is null");
+		}else{
+			LOG("mInterfaceInfo is not null");
+		}
+		LOG("---------mark5");
+		mListDevices = mEthManager.getDeviceNameList();
+		//LOG("mListDevices.size = "+mListDevices.size());
+		LOG("---------mark6");
+		if (mListDevices != null) {
+			for (EthernetDevInfo deviceinfo : mListDevices) {
+				if (!deviceinfo.getIfName().equals("eth0")) {
+					LOG("one IfName = " + deviceinfo.getIfName());
+				} else {
+					mInterfaceInfo = deviceinfo;
+					LOG("sec IfName = " + deviceinfo.getIfName());
+				}
+			}
+		}else{
+			
+		}
+		LOG("---------mark7");
+		try{
+			mInterfaceInfo.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
+			mEthManager.updateDevInfo(mInterfaceInfo);
+			mEthManager.setEnabled(true);
+			Thread.sleep(500);
+		}catch(Exception e){
+			LOG("set ethernet enable fail");
+		}
+		LOG("---------mark8");
+	}
+
 	private void setIPMap(){
 		mIPInfoMap.put("Mode", mInterfaceInfo.getConnectMode()==EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL?"manual":"dhcp");
 		mIPInfoMap.put("IfName", mInterfaceInfo.getIfName());
