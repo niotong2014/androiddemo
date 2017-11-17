@@ -50,7 +50,7 @@ public class OcocciService extends Service {
 	Map<String,String> mIPInfoMap = new HashMap<String,String>();
 	
 	private EthernetManager mEthManager;
-	private EthernetDevInfo mInterfaceInfo = new EthernetDevInfo();
+	private EthernetDevInfo mInterfaceInfo;
 	private List<EthernetDevInfo> mListDevices = new ArrayList<EthernetDevInfo>();
 	
 	private static final String TAG = "niotongyuan_SerialPortService";
@@ -165,48 +165,20 @@ public class OcocciService extends Service {
 
 	protected  void onDataReceived(final byte[] buffer, final int size){
 		//parse command if command is incorrect return error info
-		//if command is setIP do setIP(set ip ,and return is success)
+		//if command is setIP do setMapToIP(set ip ,and return is success)
 		//if command is getIP do getIP(get IP info and write it to uart)
-		setIP();
-		getIP();
+		
+		//setMapToIP();
+		PrintIPInfo();
 	}
 	private void IPInit(){
-		LOG("---------mark1");
 		mEthManager = EthernetManager.getInstance();
 		if(mEthManager.getState() == EthernetManager.ETHERNET_STATE_ENABLED){
 			LOG("ethernet is enabled");
 		}else{
 			LOG("ethernet is disabled");
-			/*
-			try{
-				mInterfaceInfo.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
-				mEthManager.updateDevInfo(mInterfaceInfo);
-				mEthManager.setEnabled(true);
-				Thread.sleep(500);
-			}catch(Exception e){
-				LOG("set ethernet enable fail");
-			}
-			*/
 		}
-		LOG("getTotalInterface = "+mEthManager.getTotalInterface());
-		LOG("---------mark2");
-		if(mEthManager.isConfigured()){
-			LOG("ethernet is configured");
-		}else{
-			LOG("ethernet is not configured");
-		}
-		LOG("---------mark3");
-		mInterfaceInfo = mEthManager.getSavedConfig();
-		LOG("---------mark4");
-		if(mInterfaceInfo == null){
-			LOG("mInterfaceInfo is null");
-		}else{
-			LOG("mInterfaceInfo is not null");
-		}
-		LOG("---------mark5");
 		mListDevices = mEthManager.getDeviceNameList();
-		//LOG("mListDevices.size = "+mListDevices.size());
-		LOG("---------mark6");
 		if (mListDevices != null) {
 			for (EthernetDevInfo deviceinfo : mListDevices) {
 				if (!deviceinfo.getIfName().equals("eth0")) {
@@ -215,23 +187,33 @@ public class OcocciService extends Service {
 					mInterfaceInfo = deviceinfo;
 					LOG("sec IfName = " + deviceinfo.getIfName());
 				}
+				try {
+					//mInterfaceInfo.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
+					mEthManager.updateDevInfo(mInterfaceInfo);
+					mEthManager.setEnabled(true);
+					Thread.sleep(500);
+				} catch (Exception e) {
+					LOG("set ethernet enable fail");
+				}
 			}
-		}else{
-			
+		} else {
+			LOG("there is no ethernet devices");
 		}
-		LOG("---------mark7");
-		try{
-			mInterfaceInfo.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
-			mEthManager.updateDevInfo(mInterfaceInfo);
-			mEthManager.setEnabled(true);
-			Thread.sleep(500);
-		}catch(Exception e){
-			LOG("set ethernet enable fail");
-		}
-		LOG("---------mark8");
+		setIPToMap();
+		PrintIPInfo();		//print IP info
+		
+		//the below for test set static IP
+		testSetMap();	//set static IP info to mIPInfoMap
+		setMapToIP();		//set static IP
+		PrintIPInfo();		//print IP info
 	}
 
-	private void setIPMap(){
+	private boolean setIPToMap(){
+		LOG("----setIPMap----");
+		if(mInterfaceInfo == null){
+			LOG("setIPMap() mInterfaceInfo is null");
+			return false;
+		}
 		mIPInfoMap.put("Mode", mInterfaceInfo.getConnectMode()==EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL?"manual":"dhcp");
 		mIPInfoMap.put("IfName", mInterfaceInfo.getIfName());
 		mIPInfoMap.put("IP", mInterfaceInfo.getIpAddress());
@@ -239,19 +221,56 @@ public class OcocciService extends Service {
 		mIPInfoMap.put("GateWay", mInterfaceInfo.getGateWay());
 		mIPInfoMap.put("DnsAddr", mInterfaceInfo.getDnsAddr());
 		mIPInfoMap.put("Hwaddr", mInterfaceInfo.getHwaddr());
+		return true;
 	}
 	
-	private void setIP(){
+	private boolean setMapToIP(){
 		LOG("----doing something to set IP");
+		if(mInterfaceInfo == null){
+			LOG("setIP() mInterfaceInfo is null");
+			return false;
+		}
 		mInterfaceInfo.setConnectMode(mIPInfoMap.get("Mode").equals("manual")?EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL:EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
-		mInterfaceInfo.setIpAddress(mIPInfoMap.get("IP"));
-		mInterfaceInfo.setNetMask(mIPInfoMap.get("NetMask"));
-		mInterfaceInfo.setDnsAddr(mIPInfoMap.get("DnsAddr"));
-		mInterfaceInfo.setGateWay(mIPInfoMap.get("GateWay"));
-		mEthManager.updateDevInfo(mInterfaceInfo);
+		
+		if (mIPInfoMap.get("Mode").equals("manual")) {
+			mInterfaceInfo.setIpAddress(mIPInfoMap.get("IP"));
+			mInterfaceInfo.setNetMask(mIPInfoMap.get("NetMask"));
+			mInterfaceInfo.setDnsAddr(mIPInfoMap.get("DnsAddr"));
+			mInterfaceInfo.setGateWay(mIPInfoMap.get("GateWay"));
+		}
+		try{
+			mEthManager.updateDevInfo(mInterfaceInfo);
+			mEthManager.setEnabled(true);
+			Thread.sleep(500);
+		}catch(Exception e){
+			LOG("setIP() set the saved ethernet enable fail");
+			return false;
+		}
+		return true;
 	}
 	
-	private void getIP(){
-		LOG("----doing something to get IP");
+	private boolean PrintIPInfo(){
+		LOG("----doing something to PrintIPInfo");
+		if(mInterfaceInfo == null){
+			LOG("PrintIPInfo() mInterfaceInfo is null");
+			return false;
+		}
+		LOG("Mode = "+ (mInterfaceInfo.getConnectMode()==EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL?"manual":"dhcp"));
+		LOG("IfName = "+mInterfaceInfo.getIfName());
+		LOG("IP = "+mInterfaceInfo.getIpAddress());
+		LOG("NetMask = "+mInterfaceInfo.getNetMask());
+		LOG("GateWay = "+mInterfaceInfo.getGateWay());
+		LOG("DnsAddr = "+mInterfaceInfo.getDnsAddr());
+		LOG("Hwaddr = "+mInterfaceInfo.getHwaddr());
+		return true;
+	}
+	
+	private void testSetMap(){
+		LOG("----testSetMap----");
+		mIPInfoMap.put("Mode", "manual");
+		mIPInfoMap.put("IP", "192.168.0.177");
+		mIPInfoMap.put("NetMask", "255.255.255.0");
+		mIPInfoMap.put("GateWay", "192.168.0.2");
+		mIPInfoMap.put("DnsAddr", "192.168.0.2");
 	}
 }
