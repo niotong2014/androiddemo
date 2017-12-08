@@ -22,8 +22,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 import java.security.InvalidParameterException;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -57,7 +55,6 @@ public class OcocciService extends Service {
 	
 	private PCReadThread mPCReadThread;
 	private STMReadThread mSTMReadThread;
-	Map<String,String> mIPInfoMap = new HashMap<String,String>();
 	
 	private EthernetManager mEthManager;
 	private EthernetDevInfo mInterfaceInfo;
@@ -176,15 +173,11 @@ public class OcocciService extends Service {
 			super.run();
 			while(!isInterrupted()) {
 				int size;
-				int i;
 				try {
 					byte[] buffer = new byte[64];
 					if (mPCInputStream == null) return;
 					size = mPCInputStream.read(buffer);
 					if (size > 0) {
-						for (i = 0;i < size;i++){
-							LOG("----yuan----"+buffer[i]+"------");
-						}
 						onPCDataReceived(buffer, size);
 					}
 				} catch (IOException e) {
@@ -195,32 +188,31 @@ public class OcocciService extends Service {
 		}
 	}
 	
-	protected void onPCDataReceived(final byte[] buffer, final int size) {
-		String pccmd = new String(buffer, 0, size);
-		LOG("PC: " + pccmd);
+	protected void onPCDataReceived( final byte[] buffer, final int size) {
 		try {
-			if (parsePCCMD(pccmd)) {
-				if(myPreference.getString("Type", "GET").equals("GET")){
-					//do something
-					mPCOutputStream.write(new String("OCO;"+
+			if (parsePCCMD(buffer,size)) {
+				if(myPreference.getString("Type", "getIP").equals("getIP")){
+					//send Info of  IP  to PC
+					setIPToSharedPerence();
+					mPCOutputStream.write(new String(
 					myPreference.getString("Mode", "dhcp")+";"+
 					myPreference.getString("IP", "0.0.0.0")+";"+
 					myPreference.getString("NetMask", "255.255.255.0")+";"+
 					myPreference.getString("GateWay", "8.8.8.8")+";"+
-					myPreference.getString("DnsAddr", "0.0.0.0")+
-							";CCI").getBytes());
+					myPreference.getString("DnsAddr", "0.0.0.0")
+							).getBytes());
 					return;
 				}
 				if (setSharedPerenceToIP() == true) {
-					mPCOutputStream.write(new String("OCO;SUCCESS;SETIP;CCI")
+					mPCOutputStream.write(new String("SUCCESS;SETIP")
 							.getBytes());
 				} else {
-					mPCOutputStream.write(new String("OCO;FAIL;SETIP;CCI")
+					mPCOutputStream.write(new String("FAIL;SETIP")
 							.getBytes());
 				}
 			} else {
 				// the cmd is not cmd
-				mPCOutputStream.write(new String("OCO;FAIL;PARSEPCCMD;CCI")
+				mPCOutputStream.write(new String("FAIL;PARSEPCCMD")
 						.getBytes());
 			}
 		} catch (IOException e) {
@@ -261,37 +253,48 @@ public class OcocciService extends Service {
 	
 	
 	
-	private boolean parsePCCMD(String mCmd){
-		String[] cmdArray = mCmd.split(";");
-		int size = cmdArray.length;
+	@SuppressLint("CommitPrefEdits")
+	private boolean parsePCCMD( final byte[] buffer, final int size){
+		for (int i = 0;i < size;i++){
+			LOG("----yuan----"+buffer[i]+"------");
+		}
+		if(buffer[0] == 84 && buffer[1] == 89 && buffer[2]== 0){
+			
+		}else{
+			return false;
+		}
 		Editor editor = myPreference.edit();
-		for(String s : cmdArray){
-			LOG("cmdArray[]:"+s+"-----");
-		}
-		//OCO；SET；MANUAL；192.168.0.177；255.255.255.0；192.168.0.2；192.168.0.2；CCI
-		//OCO；SET；DHCP；CCI
-		//OCO；GET；CCI
-		if(!cmdArray[0].equals("OCO")){
-			return false;
-		}
-		if(!cmdArray[size-1].equals("CCI")){
-			return false;
-		}
-		editor.putString("Type", cmdArray[1]);
-		if(size == 8){
-			editor.putString("Mode","manual");
-			editor.putString("IP", cmdArray[3]);
-			editor.putString("NetMask", cmdArray[4]);
-			editor.putString("GateWay", cmdArray[5]);
-			editor.putString("DnsAddr", cmdArray[6]);
-		}else if(size == 4){
-			editor.putString("Mode","dhcp");
-		}else if(size == 3){
-			//do something
+		if(buffer[3] ==24 && buffer[4]==80){
+			//setip
+			editor.putString("Type", "setIP");
+			editor.commit();
+			if(buffer[5]==0){
+				//set dhcp
+				editor.putString("Mode","dhcp");
+				editor.commit();
+			}else if(buffer[5]==1){
+				//set manual ip
+				editor.putString("Mode","manual");
+				LOG("IP:"+bytesToIP(buffer[6],buffer[7],buffer[8],buffer[9]));
+				editor.putString("IP",  bytesToIP(buffer[6],buffer[7],buffer[8],buffer[9]));
+				editor.putString("NetMask", bytesToIP(buffer[10],buffer[11],buffer[12],buffer[13]));
+				editor.putString("GateWay", bytesToIP(buffer[14],buffer[15],buffer[16],buffer[17]));
+				editor.putString("DnsAddr", bytesToIP(buffer[18],buffer[19],buffer[20],buffer[21]));
+				editor.commit();
+			}else{
+				return false;
+			}
+		}else if(buffer[3]==7 && buffer[4]==84){
+			//get ip
+			editor.putString("Type", "getIP");
+			editor.commit();
 		}else{
 			return false;
 		}
 		return true;
+	}
+	private String bytesToIP(final byte a,final byte b,final byte c,final byte d){
+		return String.format("%d.%d.%d.%d",a<0?a+256:a,b<0?b+256:b,c<0?c+256:c,d<0?d+256:d);
 	}
 	
 	
@@ -341,6 +344,7 @@ public class OcocciService extends Service {
 		editor.putString("GateWay", mInterfaceInfo.getGateWay());
 		editor.putString("DnsAddr", mInterfaceInfo.getDnsAddr());
 		editor.putString("Hwaddr", mInterfaceInfo.getHwaddr());
+		editor.commit();
 		return true;
 	}
 	
@@ -354,6 +358,7 @@ public class OcocciService extends Service {
 		if(myPreference.contains("Mode") == false){
 			Editor editor = myPreference.edit();
 			editor.putString("Mode", "dhcp");
+			editor.commit();
 		}
 		mInterfaceInfo.setConnectMode(myPreference.getString("Mode","dhcp").equals("manual")?EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL:EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
 		
@@ -374,71 +379,4 @@ public class OcocciService extends Service {
 		return true;
 	}
 	
-
-	private boolean setIPToMap(){
-		LOG("----setIPMap----");
-		if(mInterfaceInfo == null){
-			LOG("setIPMap() mInterfaceInfo is null");
-			return false;
-		}
-		mIPInfoMap.put("Mode", mInterfaceInfo.getConnectMode()==EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL?"manual":"dhcp");
-		mIPInfoMap.put("IfName", mInterfaceInfo.getIfName());
-		mIPInfoMap.put("IP", mInterfaceInfo.getIpAddress());
-		mIPInfoMap.put("NetMask", mInterfaceInfo.getNetMask());
-		mIPInfoMap.put("GateWay", mInterfaceInfo.getGateWay());
-		mIPInfoMap.put("DnsAddr", mInterfaceInfo.getDnsAddr());
-		mIPInfoMap.put("Hwaddr", mInterfaceInfo.getHwaddr());
-		return true;
-	}
-	
-	private boolean setMapToIP(){
-		LOG("----doing something to set IP");
-		if(mInterfaceInfo == null){
-			LOG("setIP() mInterfaceInfo is null");
-			return false;
-		}
-		mInterfaceInfo.setConnectMode(mIPInfoMap.get("Mode").equals("manual")?EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL:EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
-		
-		if (mIPInfoMap.get("Mode").equals("manual")) {
-			mInterfaceInfo.setIpAddress(mIPInfoMap.get("IP"));
-			mInterfaceInfo.setNetMask(mIPInfoMap.get("NetMask"));
-			mInterfaceInfo.setDnsAddr(mIPInfoMap.get("DnsAddr"));
-			mInterfaceInfo.setGateWay(mIPInfoMap.get("GateWay"));
-		}
-		try{
-			mEthManager.updateDevInfo(mInterfaceInfo);
-			mEthManager.setEnabled(true);
-			Thread.sleep(500);
-		}catch(Exception e){
-			LOG("setIP() set the saved ethernet enable fail");
-			return false;
-		}
-		return true;
-	}
-
-	
-	private boolean PrintIPInfo(){
-		LOG("----doing something to PrintIPInfo");
-		if(mInterfaceInfo == null){
-			LOG("PrintIPInfo() mInterfaceInfo is null");
-			return false;
-		}
-		LOG("Mode = "+ (mInterfaceInfo.getConnectMode()==EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL?"manual":"dhcp"));
-		LOG("IfName = "+mInterfaceInfo.getIfName());
-		LOG("IP = "+mInterfaceInfo.getIpAddress());
-		LOG("NetMask = "+mInterfaceInfo.getNetMask());
-		LOG("GateWay = "+mInterfaceInfo.getGateWay());
-		LOG("DnsAddr = "+mInterfaceInfo.getDnsAddr());
-		LOG("Hwaddr = "+mInterfaceInfo.getHwaddr());
-		return true;
-	}
-	
-	private void testSetMap(){
-		LOG("----testSetMap----");
-		mIPInfoMap.put("Mode", "dhcp");
-		mIPInfoMap.put("IP", "192.168.0.177");
-		mIPInfoMap.put("NetMask", "255.255.255.0");
-		mIPInfoMap.put("GateWay", "192.168.0.2");
-		mIPInfoMap.put("DnsAddr", "192.168.0.2");
-	}
 }
