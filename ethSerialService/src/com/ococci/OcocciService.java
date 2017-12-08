@@ -25,33 +25,45 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.security.InvalidParameterException;
-
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Service;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
-
 import com.ococci.SerialPort;
 import com.ococci.aidl.OcocciInterface;
-
 import android.net.ethernet.EthernetDevInfo;
 import android.net.ethernet.EthernetManager;
 
 public class OcocciService extends Service {
 
-	protected SerialPort mSerialPort;
-	protected OutputStream mOutputStream;
-	private InputStream mInputStream;
-	private ReadThread mReadThread;
+	private static final String PC_SERIAL = "/dev/ttyS3";
+	private static final String STM_SERIAL = "/dev/ttyS1";
+	
+	protected SerialPort mPCSerialPort;
+	protected OutputStream mPCOutputStream;
+	private InputStream mPCInputStream;
+	
+	protected SerialPort mSTMSerialPort;
+	protected OutputStream mSTMOutputStream;
+	private InputStream mSTMInputStream;
+	
+	private PCReadThread mPCReadThread;
+	private STMReadThread mSTMReadThread;
 	Map<String,String> mIPInfoMap = new HashMap<String,String>();
 	
 	private EthernetManager mEthManager;
 	private EthernetDevInfo mInterfaceInfo;
 	private List<EthernetDevInfo> mListDevices = new ArrayList<EthernetDevInfo>();
+	
+	SharedPreferences myPreference; 
 	
 	private static final String TAG = "niotongyuan_SerialPortService";
 	
@@ -74,16 +86,25 @@ public class OcocciService extends Service {
 	public void onCreate(){
 		LOG("Service onCreate");
 		super.onCreate();
+		myPreference = getSharedPreferences("ipset",Context.MODE_PRIVATE);
 		IPInit();
 	
 		try {
-			mSerialPort = new SerialPort(new File("/dev/ttyS2"), 115200, 0);
-			mOutputStream = mSerialPort.getOutputStream();
-			mInputStream = mSerialPort.getInputStream();
-
+			mPCSerialPort = new SerialPort(new File(PC_SERIAL), 115200, 0);
+			mPCOutputStream = mPCSerialPort.getOutputStream();
+			mPCInputStream = mPCSerialPort.getInputStream();
 			/* Create a receiving thread */
-			mReadThread = new ReadThread();
-			mReadThread.start();
+			mPCReadThread = new PCReadThread();
+			mPCReadThread.start();
+			
+			mSTMSerialPort = new SerialPort(new File(STM_SERIAL), 115200, 0);
+			mSTMOutputStream = mSTMSerialPort.getOutputStream();
+			mSTMInputStream = mSTMSerialPort.getInputStream();
+			/* Create a receiving thread */
+			mSTMReadThread = new STMReadThread();
+			mSTMReadThread.start();
+			
+			
 		} catch (SecurityException e) {
 			DisplayError(R.string.error_security);
 		} catch (IOException e) {
@@ -101,6 +122,7 @@ public class OcocciService extends Service {
 		LOG("Service onBind");
 		return mBinder;
 	}
+	
 	public void onStart(Intent intent,int startID){
 		LOG("Service onStart" + startID);
 	}
@@ -108,11 +130,17 @@ public class OcocciService extends Service {
 	public void onDestroy(){
 		LOG("Service onDestroy");
 		super.onDestroy();
-		if (mReadThread != null)
-			mReadThread.interrupt();
-		if(mSerialPort != null)
-			mSerialPort.serial_close();
-		mSerialPort = null;
+		if (mPCReadThread != null)
+			mPCReadThread.interrupt();
+		if(mPCSerialPort != null)
+			mPCSerialPort.serial_close();
+		mPCSerialPort = null;
+		
+		if (mSTMReadThread != null)
+			mSTMReadThread.interrupt();
+		if(mSTMSerialPort != null)
+			mSTMSerialPort.serial_close();
+		mSTMSerialPort = null;
 	}
 	
 	public boolean onUnbind (Intent intent){
@@ -141,7 +169,69 @@ public class OcocciService extends Service {
 		}
 	};
 
-	private class ReadThread extends Thread {
+	private class PCReadThread extends Thread {
+
+		@Override
+		public void run() {
+			super.run();
+			while(!isInterrupted()) {
+				int size;
+				int i;
+				try {
+					byte[] buffer = new byte[64];
+					if (mPCInputStream == null) return;
+					size = mPCInputStream.read(buffer);
+					if (size > 0) {
+						for (i = 0;i < size;i++){
+							LOG("----yuan----"+buffer[i]+"------");
+						}
+						onPCDataReceived(buffer, size);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+					return;
+				}
+			}
+		}
+	}
+	
+	protected void onPCDataReceived(final byte[] buffer, final int size) {
+		String pccmd = new String(buffer, 0, size);
+		LOG("PC: " + pccmd);
+		try {
+			if (parsePCCMD(pccmd)) {
+				if(myPreference.getString("Type", "GET").equals("GET")){
+					//do something
+					mPCOutputStream.write(new String("OCO;"+
+					myPreference.getString("Mode", "dhcp")+";"+
+					myPreference.getString("IP", "0.0.0.0")+";"+
+					myPreference.getString("NetMask", "255.255.255.0")+";"+
+					myPreference.getString("GateWay", "8.8.8.8")+";"+
+					myPreference.getString("DnsAddr", "0.0.0.0")+
+							";CCI").getBytes());
+					return;
+				}
+				if (setSharedPerenceToIP() == true) {
+					mPCOutputStream.write(new String("OCO;SUCCESS;SETIP;CCI")
+							.getBytes());
+				} else {
+					mPCOutputStream.write(new String("OCO;FAIL;SETIP;CCI")
+							.getBytes());
+				}
+			} else {
+				// the cmd is not cmd
+				mPCOutputStream.write(new String("OCO;FAIL;PARSEPCCMD;CCI")
+						.getBytes());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	
+	
+	private class STMReadThread extends Thread {
 
 		@Override
 		public void run() {
@@ -150,10 +240,10 @@ public class OcocciService extends Service {
 				int size;
 				try {
 					byte[] buffer = new byte[64];
-					if (mInputStream == null) return;
-					size = mInputStream.read(buffer);
+					if (mSTMInputStream == null) return;
+					size = mSTMInputStream.read(buffer);
 					if (size > 0) {
-						onDataReceived(buffer, size);
+						onSTMDataReceived(buffer, size);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -163,14 +253,48 @@ public class OcocciService extends Service {
 		}
 	}
 
-	protected  void onDataReceived(final byte[] buffer, final int size){
-		//parse command if command is incorrect return error info
-		//if command is setIP do setMapToIP(set ip ,and return is success)
-		//if command is getIP do getIP(get IP info and write it to uart)
+	protected  void onSTMDataReceived(final byte[] buffer, final int size){
+	
+		LOG("STM: "+new String(buffer, 0, size));
 		
-		//setMapToIP();
-		PrintIPInfo();
 	}
+	
+	
+	
+	private boolean parsePCCMD(String mCmd){
+		String[] cmdArray = mCmd.split(";");
+		int size = cmdArray.length;
+		Editor editor = myPreference.edit();
+		for(String s : cmdArray){
+			LOG("cmdArray[]:"+s+"-----");
+		}
+		//OCO；SET；MANUAL；192.168.0.177；255.255.255.0；192.168.0.2；192.168.0.2；CCI
+		//OCO；SET；DHCP；CCI
+		//OCO；GET；CCI
+		if(!cmdArray[0].equals("OCO")){
+			return false;
+		}
+		if(!cmdArray[size-1].equals("CCI")){
+			return false;
+		}
+		editor.putString("Type", cmdArray[1]);
+		if(size == 8){
+			editor.putString("Mode","manual");
+			editor.putString("IP", cmdArray[3]);
+			editor.putString("NetMask", cmdArray[4]);
+			editor.putString("GateWay", cmdArray[5]);
+			editor.putString("DnsAddr", cmdArray[6]);
+		}else if(size == 4){
+			editor.putString("Mode","dhcp");
+		}else if(size == 3){
+			//do something
+		}else{
+			return false;
+		}
+		return true;
+	}
+	
+	
 	private void IPInit(){
 		mEthManager = EthernetManager.getInstance();
 		if(mEthManager.getState() == EthernetManager.ETHERNET_STATE_ENABLED){
@@ -199,14 +323,57 @@ public class OcocciService extends Service {
 		} else {
 			LOG("there is no ethernet devices");
 		}
-		setIPToMap();
-		PrintIPInfo();		//print IP info
-		
-		//the below for test set static IP
-		testSetMap();	//set static IP info to mIPInfoMap
-		setMapToIP();		//set static IP
-		PrintIPInfo();		//print IP info
+		setSharedPerenceToIP();
 	}
+	
+	@SuppressLint("CommitPrefEdits")
+	private boolean setIPToSharedPerence(){
+		LOG("----setIPToSharedPerence----");
+		if(mInterfaceInfo == null){
+			LOG("setIPToSharedPerence() mInterfaceInfo is null");
+			return false;
+		}
+		Editor editor = myPreference.edit();
+		editor.putString("Mode", mInterfaceInfo.getConnectMode()==EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL?"manual":"dhcp");
+		editor.putString("IfName", mInterfaceInfo.getIfName());
+		editor.putString("IP", mInterfaceInfo.getIpAddress());
+		editor.putString("NetMask",mInterfaceInfo.getNetMask());
+		editor.putString("GateWay", mInterfaceInfo.getGateWay());
+		editor.putString("DnsAddr", mInterfaceInfo.getDnsAddr());
+		editor.putString("Hwaddr", mInterfaceInfo.getHwaddr());
+		return true;
+	}
+	
+	@SuppressLint("CommitPrefEdits")
+	private boolean setSharedPerenceToIP(){
+		LOG("----setSharedPerenceToIP------");
+		if(mInterfaceInfo == null){
+			LOG("setSharedPerenceToIP() mInterfaceInfo is null");
+			return false;
+		}
+		if(myPreference.contains("Mode") == false){
+			Editor editor = myPreference.edit();
+			editor.putString("Mode", "dhcp");
+		}
+		mInterfaceInfo.setConnectMode(myPreference.getString("Mode","dhcp").equals("manual")?EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL:EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
+		
+		if (myPreference.getString("Mode","dhcp").equals("manual")) {
+			mInterfaceInfo.setIpAddress(myPreference.getString("IP","0.0.0.0"));
+			mInterfaceInfo.setNetMask(myPreference.getString("NetMask","255.255.255.0"));
+			mInterfaceInfo.setDnsAddr(myPreference.getString("DnsAddr","8.8.8.8"));
+			mInterfaceInfo.setGateWay(myPreference.getString("GateWay","0.0.0.0"));
+		}
+		try{
+			mEthManager.updateDevInfo(mInterfaceInfo);
+			mEthManager.setEnabled(true);
+			Thread.sleep(500);
+		}catch(Exception e){
+			LOG("setSharedPerenceToIP() set the saved ethernet enable fail");
+			return false;
+		}
+		return true;
+	}
+	
 
 	private boolean setIPToMap(){
 		LOG("----setIPMap----");
@@ -248,6 +415,7 @@ public class OcocciService extends Service {
 		}
 		return true;
 	}
+
 	
 	private boolean PrintIPInfo(){
 		LOG("----doing something to PrintIPInfo");
@@ -267,7 +435,7 @@ public class OcocciService extends Service {
 	
 	private void testSetMap(){
 		LOG("----testSetMap----");
-		mIPInfoMap.put("Mode", "manual");
+		mIPInfoMap.put("Mode", "dhcp");
 		mIPInfoMap.put("IP", "192.168.0.177");
 		mIPInfoMap.put("NetMask", "255.255.255.0");
 		mIPInfoMap.put("GateWay", "192.168.0.2");
