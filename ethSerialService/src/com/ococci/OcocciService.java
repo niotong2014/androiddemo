@@ -52,6 +52,9 @@ public class OcocciService extends Service {
 	protected SerialPort mSTMSerialPort;
 	protected OutputStream mSTMOutputStream;
 	private InputStream mSTMInputStream;
+	private boolean waitCmd = false;
+	private boolean stmStatus = false;	//if get USBID status ,this value is it
+	private boolean stmRetVal = false;
 	
 	private PCReadThread mPCReadThread;
 	private STMReadThread mSTMReadThread;
@@ -61,6 +64,8 @@ public class OcocciService extends Service {
 	private List<EthernetDevInfo> mListDevices = new ArrayList<EthernetDevInfo>();
 	
 	SharedPreferences myPreference; 
+	
+	private byte testSTM[] = {0x12,0x12,0x3,0x0D,0x0A};
 	
 	private static final String TAG = "niotongyuan_SerialPortService";
 	
@@ -164,6 +169,46 @@ public class OcocciService extends Service {
 			LOG("remote call from client! current thread id =  "+ Thread.currentThread());
 			return 0;
 		}
+
+		@Override
+		public boolean usbFunc(int usbid, int type, boolean on) throws RemoteException {
+			// TODO Auto-generated method stub
+			byte stmBuffer[] = new byte[7];
+			stmRetVal = false;
+			stmStatus = false;
+			
+			if(usbid<1 || usbid>200)
+				return false;
+			if(type != 1 || type != 2)
+			stmBuffer[0] = 0x13;
+			stmBuffer[1] = 0x14;
+			stmBuffer[2] = (byte) type;	//type 0x1 is set ,0x2 is get
+			stmBuffer[3] = (byte) usbid;
+			stmBuffer[4] = (byte) (on?0x1:0x2); //0x1 is on 0x2 is off
+			stmBuffer[5] = 0x05;
+			stmBuffer[6] = 0x20;
+			waitCmd = true;
+			try {
+				LOG("usbFunc()  send");
+				mSTMOutputStream.write(stmBuffer);
+				Thread.sleep(2000);
+			}catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}catch (InterruptedException e){
+				e.printStackTrace();
+				return false;
+			}
+			//if waitCmd is not false so stm not return any data
+			if(waitCmd != false){
+				LOG("usbFunc()  no cmd come from stm");
+				return false;
+			}
+			if(type == 2)
+				on = stmStatus;
+			
+			return stmRetVal;
+		}
 	};
 
 	private class PCReadThread extends Thread {
@@ -204,6 +249,7 @@ public class OcocciService extends Service {
 					return;
 				}
 				if (setSharedPerenceToIP() == true) {
+					mSTMOutputStream.write(testSTM);
 					mPCOutputStream.write(new String("SUCCESS;SETIP")
 							.getBytes());
 				} else {
@@ -247,7 +293,11 @@ public class OcocciService extends Service {
 
 	protected  void onSTMDataReceived(final byte[] buffer, final int size){
 	
-		LOG("STM: "+new String(buffer, 0, size));
+		if(parseSTMCMD(buffer, size) == true){
+			LOG("parseSTMCMD is true");
+		}else{
+			LOG("parseSTMCMD is false");
+		}
 		
 	}
 	
@@ -256,7 +306,7 @@ public class OcocciService extends Service {
 	@SuppressLint("CommitPrefEdits")
 	private boolean parsePCCMD( final byte[] buffer, final int size){
 		for (int i = 0;i < size;i++){
-			LOG("----yuan----"+buffer[i]+"------");
+			LOG("----PC----"+buffer[i]+"------");
 		}
 		if(buffer[0] == 84 && buffer[1] == 89 && buffer[2]== 0){
 			
@@ -293,6 +343,32 @@ public class OcocciService extends Service {
 		}
 		return true;
 	}
+	
+	@SuppressLint("CommitPrefEdits")
+	private boolean parseSTMCMD( final byte[] buffer, final int size){
+		for (int i = 0;i < size;i++){
+			LOG("----STM----"+buffer[i]+"------");
+		}
+		if(waitCmd != true)
+		{
+			LOG("parseSTMCMD  mask1");
+			return false;
+		}
+		if(buffer[0] == 0x13 && buffer[1] == 0x14 && buffer[5] == 0x05 && buffer[6]==0x20){
+			
+		}else{
+			return false;
+		}
+		if(buffer[2] == 0x2)
+		{
+			stmStatus = buffer[4]==0x01?true:false;
+		}
+		stmRetVal = true;
+		waitCmd = false;
+		return true;
+	}
+	
+	
 	private String bytesToIP(final byte a,final byte b,final byte c,final byte d){
 		return String.format("%d.%d.%d.%d",a<0?a+256:a,b<0?b+256:b,c<0?c+256:c,d<0?d+256:d);
 	}
