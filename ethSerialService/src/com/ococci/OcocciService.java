@@ -173,23 +173,26 @@ public class OcocciService extends Service {
 		@Override
 		public boolean usbFunc(int usbid, int type, boolean on) throws RemoteException {
 			// TODO Auto-generated method stub
-			byte stmBuffer[] = new byte[7];
+			byte stmBuffer[] = new byte[10];
 			stmRetVal = false;
 			stmStatus = false;
-			
-			if(usbid<1 || usbid>200)
+			//0x13 0x14 type usbid val  reserve1   reserve2 reserve3 0x05 0x20
+			if(usbid<1 || usbid>100)
 				return false;
-			if(type != 1 || type != 2)
+			
 			stmBuffer[0] = 0x13;
 			stmBuffer[1] = 0x14;
 			stmBuffer[2] = (byte) type;	//type 0x1 is set ,0x2 is get
 			stmBuffer[3] = (byte) usbid;
 			stmBuffer[4] = (byte) (on?0x1:0x2); //0x1 is on 0x2 is off
-			stmBuffer[5] = 0x05;
-			stmBuffer[6] = 0x20;
+			stmBuffer[5] = 0x0;
+			stmBuffer[6] = 0x0;
+			stmBuffer[7] = 0x0;			
+			stmBuffer[8] = 0x05;
+			stmBuffer[9] = 0x20;
 			waitCmd = true;
 			try {
-				LOG("usbFunc()  send");
+				LOG("usbFunc()  send! "+stmBuffer[3]);
 				mSTMOutputStream.write(stmBuffer);
 				Thread.sleep(2000);
 			}catch (IOException e) {
@@ -354,7 +357,7 @@ public class OcocciService extends Service {
 			LOG("parseSTMCMD  mask1");
 			return false;
 		}
-		if(buffer[0] == 0x13 && buffer[1] == 0x14 && buffer[5] == 0x05 && buffer[6]==0x20){
+		if(buffer[0] == 0x13 && buffer[1] == 0x14 && buffer[8] == 0x05 && buffer[9]==0x20){
 			
 		}else{
 			return false;
@@ -362,6 +365,14 @@ public class OcocciService extends Service {
 		if(buffer[2] == 0x2)
 		{
 			stmStatus = buffer[4]==0x01?true:false;
+		}else if(buffer[2] == 0x3){
+			LOG("first stm uart1 received cmd is wrong!");
+		}else if(buffer[2] == 0x4){
+			LOG("first stm uart2 received cmd is wrong!");
+		}else if(buffer[2] == 0x5){
+			LOG("second stm uart1 received cmd is wrong!");
+		}else if(buffer[2] == 0x6){
+			LOG("some wrong in second stm!");
 		}
 		stmRetVal = true;
 		waitCmd = false;
