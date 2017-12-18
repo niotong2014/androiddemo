@@ -103,20 +103,30 @@ public class MainActivity extends Activity implements android.view.View.OnClickL
 		public void onServiceConnected(ComponentName arg0, IBinder arg1) {
 			// TODO Auto-generated method stub
 			LOG("onServiceConnected");
+			boolean usbstatus = false;
+			int retVal = 0;
 			mService = OcocciInterface.Stub.asInterface(arg1);
 			try {
 				for(int i = 1;i<=25;i++)
 				{
-					mService.usbFunc(i, 1, true);
-					Thread.sleep(2000);
+					if((i%2) == 0){
+						retVal = mService.usbFunc(i, 1, true);
+					
+					}else{
+						retVal = mService.usbFunc(i, 1, false);
+					}
+					LOG("set usbid = "+i+"  retVal ="+retVal);
+				}
+				for(int i = 1;i<=25;i++)
+				{
+					usbstatus =  false;
+					retVal = mService.usbFunc(i, 2, usbstatus);
+					LOG("get usbid = "+i+"  retVal ="+retVal);
 				}
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			} 
 		}
 	};
 }

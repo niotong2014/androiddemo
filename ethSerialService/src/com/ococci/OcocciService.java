@@ -41,6 +41,19 @@ import android.net.ethernet.EthernetDevInfo;
 import android.net.ethernet.EthernetManager;
 
 public class OcocciService extends Service {
+	private static final int USBFUNC_DEFAULT_VAL = 0;
+	private static final int USBFUNC_WRONG_PARM = 1;
+	private static final int USBFUNC_NOT_RECIVED = 2;
+	private static final int USBFUNC_NOT_SEND = 3;
+	private static final int USBFUNC_RECIVED_ERR =  4;
+	private static final int USBFUNC_FIRST_STM_UART1_ERR= 5;
+	private static final int USBFUNC_FIRST_STM_UART2_ERR= 6;
+	private static final int USBFUNC_SECOND_STM_UART1_ERR = 7;
+	private static final int USBFUNC_SET_SUCCESS = 8;
+	private static final int USBFUNC_SET_FAIL = 9;
+	private static final int USBFUNC_USB_STATUS_ON = 10;
+	private static final int 	USBFUNC_USB_STATUS_OFF = 11;
+	private static final int 	USBFUNC_USB_LAST_ERR = 12;
 
 	private static final String PC_SERIAL = "/dev/ttyS3";
 	private static final String STM_SERIAL = "/dev/ttyS1";
@@ -52,12 +65,12 @@ public class OcocciService extends Service {
 	protected SerialPort mSTMSerialPort;
 	protected OutputStream mSTMOutputStream;
 	private InputStream mSTMInputStream;
-	private boolean waitCmd = false;
 	private boolean stmStatus = false;	//if get USBID status ,this value is it
-	private boolean stmRetVal = false;
+	private int stmVal = 0;
 	
 	private PCReadThread mPCReadThread;
 	private STMReadThread mSTMReadThread;
+	private Thread mSTMWriteThread;
 	
 	private EthernetManager mEthManager;
 	private EthernetDevInfo mInterfaceInfo;
@@ -171,14 +184,17 @@ public class OcocciService extends Service {
 		}
 
 		@Override
-		public boolean usbFunc(int usbid, int type, boolean on) throws RemoteException {
+		public int usbFunc(int usbid, int type, boolean on) throws RemoteException {
 			// TODO Auto-generated method stub
+			mSTMWriteThread = Thread.currentThread();
 			byte stmBuffer[] = new byte[10];
-			stmRetVal = false;
 			stmStatus = false;
-			//0x13 0x14 type usbid val  reserve1   reserve2 reserve3 0x05 0x20
+			stmVal = 0;
+			//0x13 0x14 type usbid val retval   reserve2 reserve3 0x05 0x20
 			if(usbid<1 || usbid>100)
-				return false;
+				return USBFUNC_WRONG_PARM;
+			if(type != 1 && type != 2)
+				return USBFUNC_WRONG_PARM;
 			
 			stmBuffer[0] = 0x13;
 			stmBuffer[1] = 0x14;
@@ -190,27 +206,18 @@ public class OcocciService extends Service {
 			stmBuffer[7] = 0x0;			
 			stmBuffer[8] = 0x05;
 			stmBuffer[9] = 0x20;
-			waitCmd = true;
 			try {
-				LOG("usbFunc()  send! "+stmBuffer[3]);
 				mSTMOutputStream.write(stmBuffer);
-				Thread.sleep(2000);
+				Thread.sleep(5000);
 			}catch (IOException e) {
 				e.printStackTrace();
-				return false;
+				return USBFUNC_NOT_SEND;
 			}catch (InterruptedException e){
 				e.printStackTrace();
-				return false;
-			}
-			//if waitCmd is not false so stm not return any data
-			if(waitCmd != false){
-				LOG("usbFunc()  no cmd come from stm");
-				return false;
-			}
-			if(type == 2)
-				on = stmStatus;
-			
-			return stmRetVal;
+				LOG("get response from stm!");
+				return stmVal;
+			}		
+			return USBFUNC_NOT_RECIVED;
 		}
 	};
 
@@ -352,30 +359,15 @@ public class OcocciService extends Service {
 		for (int i = 0;i < size;i++){
 			LOG("----STM----"+buffer[i]+"------");
 		}
-		if(waitCmd != true)
-		{
-			LOG("parseSTMCMD  mask1");
-			return false;
-		}
 		if(buffer[0] == 0x13 && buffer[1] == 0x14 && buffer[8] == 0x05 && buffer[9]==0x20){
 			
 		}else{
+			stmVal = USBFUNC_RECIVED_ERR;
+			mSTMWriteThread.interrupt();
 			return false;
 		}
-		if(buffer[2] == 0x2)
-		{
-			stmStatus = buffer[4]==0x01?true:false;
-		}else if(buffer[2] == 0x3){
-			LOG("first stm uart1 received cmd is wrong!");
-		}else if(buffer[2] == 0x4){
-			LOG("first stm uart2 received cmd is wrong!");
-		}else if(buffer[2] == 0x5){
-			LOG("second stm uart1 received cmd is wrong!");
-		}else if(buffer[2] == 0x6){
-			LOG("some wrong in second stm!");
-		}
-		stmRetVal = true;
-		waitCmd = false;
+		stmVal = buffer[5];
+		mSTMWriteThread.interrupt();//interrupt mSTMWriteThread
 		return true;
 	}
 	
