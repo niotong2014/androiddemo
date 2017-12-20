@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.security.InvalidParameterException;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Service;
@@ -35,8 +36,10 @@ import android.content.SharedPreferences.Editor;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+
 import com.ococci.SerialPort;
 import com.ococci.aidl.OcocciInterface;
+
 import android.net.ethernet.EthernetDevInfo;
 import android.net.ethernet.EthernetManager;
 
@@ -77,13 +80,13 @@ public class OcocciService extends Service {
 	private List<EthernetDevInfo> mListDevices = new ArrayList<EthernetDevInfo>();
 	
 	SharedPreferences myPreference; 
-	
-	private byte testSTM[] = {0x12,0x12,0x3,0x0D,0x0A};
-	
-	private static final String TAG = "niotongyuan_SerialPortService";
+
+	private static final boolean DEBUG = true;
+	private static final String TAG = "niotongyuan_OcocciService";
 	
 	private void LOG(String msg){
-		Log.d(TAG,msg);
+		if(DEBUG)
+			Log.d(TAG,msg);
 	}
 	
 	private void DisplayError(int resourceId) {
@@ -170,18 +173,11 @@ public class OcocciService extends Service {
 
 	private final OcocciInterface.Stub mBinder = new OcocciInterface.Stub() {
 		
-		@Override
-		public void setIPDHCP() throws RemoteException {
+		//@Override
+		//public void setIPDHCP() throws RemoteException {
 			// TODO Auto-generated method stub
-			LOG("remote call from client! current thread id =  "+ Thread.currentThread());
-		}
-
-		@Override
-		public double doCalculate(double a, double c) throws RemoteException {
-			// TODO Auto-generated method stub
-			LOG("remote call from client! current thread id =  "+ Thread.currentThread());
-			return 0;
-		}
+			//LOG("remote call from client! current thread id =  "+ Thread.currentThread());
+		//}
 
 		@Override
 		public int usbFunc(int usbid, int type, boolean on) throws RemoteException {
@@ -213,8 +209,8 @@ public class OcocciService extends Service {
 				e.printStackTrace();
 				return USBFUNC_NOT_SEND;
 			}catch (InterruptedException e){
-				e.printStackTrace();
-				LOG("get response from stm!");
+				//e.printStackTrace();
+				//LOG("get response from stm!");
 				return stmVal;
 			}		
 			return USBFUNC_NOT_RECIVED;
@@ -253,13 +249,12 @@ public class OcocciService extends Service {
 					myPreference.getString("Mode", "dhcp")+";"+
 					myPreference.getString("IP", "0.0.0.0")+";"+
 					myPreference.getString("NetMask", "255.255.255.0")+";"+
-					myPreference.getString("GateWay", "8.8.8.8")+";"+
-					myPreference.getString("DnsAddr", "0.0.0.0")
+					myPreference.getString("GateWay", "0.0.0.0")+";"+
+					myPreference.getString("DnsAddr", "8.8.8.8")
 							).getBytes());
 					return;
 				}
 				if (setSharedPerenceToIP() == true) {
-					mSTMOutputStream.write(testSTM);
 					mPCOutputStream.write(new String("SUCCESS;SETIP")
 							.getBytes());
 				} else {
@@ -335,7 +330,7 @@ public class OcocciService extends Service {
 			}else if(buffer[5]==1){
 				//set manual ip
 				editor.putString("Mode","manual");
-				LOG("IP:"+bytesToIP(buffer[6],buffer[7],buffer[8],buffer[9]));
+				//LOG("IP:"+bytesToIP(buffer[6],buffer[7],buffer[8],buffer[9]));
 				editor.putString("IP",  bytesToIP(buffer[6],buffer[7],buffer[8],buffer[9]));
 				editor.putString("NetMask", bytesToIP(buffer[10],buffer[11],buffer[12],buffer[13]));
 				editor.putString("GateWay", bytesToIP(buffer[14],buffer[15],buffer[16],buffer[17]));
@@ -407,7 +402,7 @@ public class OcocciService extends Service {
 		}
 		setSharedPerenceToIP();
 	}
-	
+
 	@SuppressLint("CommitPrefEdits")
 	private boolean setIPToSharedPerence(){
 		LOG("----setIPToSharedPerence----");
@@ -417,6 +412,12 @@ public class OcocciService extends Service {
 		}
 		Editor editor = myPreference.edit();
 		editor.putString("Mode", mInterfaceInfo.getConnectMode()==EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL?"manual":"dhcp");
+		LOG("IfName="+ mInterfaceInfo.getIfName());
+		LOG("IP="+ mInterfaceInfo.getIpAddress());
+		LOG("NetMask="+mInterfaceInfo.getNetMask());
+		LOG("GateWay="+ mInterfaceInfo.getGateWay());
+		LOG("DnsAddr="+ mInterfaceInfo.getDnsAddr());
+		LOG("Hwaddr="+ mInterfaceInfo.getHwaddr());
 		editor.putString("IfName", mInterfaceInfo.getIfName());
 		editor.putString("IP", mInterfaceInfo.getIpAddress());
 		editor.putString("NetMask",mInterfaceInfo.getNetMask());

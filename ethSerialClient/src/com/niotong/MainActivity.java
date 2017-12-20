@@ -11,19 +11,30 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
-public class MainActivity extends Activity implements android.view.View.OnClickListener{
+//0，默认值
+//1，android发送串口数据的函数的参数错误
+//2，android端不能接收到第一层stm的数据
+//3，android端串口节点无法读写
+//4，android端从第一层stm接收到的数据有误
+//5，第一层stm从android接收到的数据有误
+//6，第一层stm从第二stm接收到的数据有误
+//7，第二层stm从第一层stm接收到的数据有误
+//8，函数set IO口成功
+//9，函数set IO口失败
+//10，函数get IO口状态为高
+//11，函数get IO口状态为低
+//12，其他错误
+/*
+ * *
+ * return 为上面的说明
+ * USBID的编号为1-100
+ * TYPE  1为设置  2为获取
+ * ISON 当TYPE为1的时候ISON有效，true为供电，false为不供电
+ */
+//usbFunc(USBID, TYPE, ISON);
+public class MainActivity extends Activity{
 
-	Button bindBt;
-	Button unbindBt;
-	Button calBt;
-	EditText numEt1;
-	EditText numEt2;
-	TextView resultTv;
 	OcocciInterface mService;
 	
 	private static final String TAG = "niotongyuan_CalculateClient";
@@ -35,15 +46,6 @@ public class MainActivity extends Activity implements android.view.View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        bindBt = (Button) findViewById(R.id.bindBt);
-        unbindBt = (Button) findViewById(R.id.unbindBt);
-        calBt = (Button) findViewById(R.id.calculateBt);
-        numEt1 = (EditText) findViewById(R.id.editText1);
-        numEt2 = (EditText)  findViewById(R.id.editText2);
-        resultTv = (TextView) findViewById(R.id.result);
-        bindBt.setOnClickListener(this);
-        unbindBt.setOnClickListener(this);
-        calBt.setOnClickListener(this);
         
         Bundle args = new Bundle();
 		Intent intent = new Intent("com.ococci.OcocciService");
@@ -51,45 +53,13 @@ public class MainActivity extends Activity implements android.view.View.OnClickL
 		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 		LOG("bind OcocciService");
     }
-	@Override
-	public void onClick(View arg0) {
-		// TODO Auto-generated method stub
-		switch (arg0.getId()) {
-		case R.id.bindBt:
-			Bundle args = new Bundle();
-			Intent intent = new Intent("com.ococci.OcocciService");
-			intent.putExtras(args);
-			bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-			LOG("click bindBt");
-			break;
-		case R.id.unbindBt:
-			LOG("click unbindBt");
-			unbindService(mConnection);
-			break;
-		case R.id.calculateBt:
-			LOG("click calculateBt");
-			double a = Double.valueOf( numEt1.getText().toString());
-			double b = Double.valueOf( numEt2.getText().toString());
-			resultTv.setText("结果："+getResult(a,b));
-			break;
+    
+    @Override
+    protected void onDestroy() {
+    	unbindService(mConnection);
+    	super.onDestroy();
+    }
 
-		default:
-			break;
-		}
-	}
-	private double getResult(double a, double b) {
-		// TODO Auto-generated method stub
-		
-		double result = 0;
-		try {
-			//result = mService.doCalculate(a, b);
-			mService.usbFunc(77, 1, true);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return result;
-	}
 	private ServiceConnection mConnection = new ServiceConnection() {
 		
 		@Override
@@ -106,6 +76,7 @@ public class MainActivity extends Activity implements android.view.View.OnClickL
 			boolean usbstatus = false;
 			int retVal = 0;
 			mService = OcocciInterface.Stub.asInterface(arg1);
+			//下面这个例子是，将偶数的USB口打开，奇数的管掉，并且设置完之后读取
 			try {
 				for(int i = 1;i<=25;i++)
 				{
