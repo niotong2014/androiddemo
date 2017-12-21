@@ -38,7 +38,11 @@ LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 
 LOCAL_PROGUARD_ENABLED := disabled
 
-LOCAL_SDK_VERSION := current
+#if enadle this hide API will be unused
+#LOCAL_SDK_VERSION := current
+
+#if enable this the apk will product in /system/priv-app
+#LOCAL_PRIVILEGED_MODULE := true
 
 include $(BUILD_PACKAGE)
 

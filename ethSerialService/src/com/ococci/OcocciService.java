@@ -20,7 +20,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.security.InvalidParameterException;
 
@@ -42,6 +45,7 @@ import com.ococci.aidl.OcocciInterface;
 
 import android.net.ethernet.EthernetDevInfo;
 import android.net.ethernet.EthernetManager;
+import android.os.SystemProperties;
 
 public class OcocciService extends Service {
 	private static final int USBFUNC_DEFAULT_VAL = 0;
@@ -402,7 +406,32 @@ public class OcocciService extends Service {
 		}
 		setSharedPerenceToIP();
 	}
+    public  String niotonggetIPAddress(boolean useIPv4) {
+        try {
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
+                for (InetAddress addr : addrs) {
+                    if (!addr.isLoopbackAddress()) {
+                        String sAddr = addr.getHostAddress();
+                        //boolean isIPv4 = InetAddressUtils.isIPv4Address(sAddr);
+                        boolean isIPv4 = sAddr.indexOf(':')<0;
 
+                        if (useIPv4) {
+                            if (isIPv4) 
+                                return sAddr;
+                        } else {
+                            if (!isIPv4) {
+                                int delim = sAddr.indexOf('%'); // drop ip6 zone suffix
+                                return delim<0 ? sAddr.toUpperCase() : sAddr.substring(0, delim).toUpperCase();
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) { } // for now eat exceptions
+        return "";
+    }
 	@SuppressLint("CommitPrefEdits")
 	private boolean setIPToSharedPerence(){
 		LOG("----setIPToSharedPerence----");
@@ -411,19 +440,25 @@ public class OcocciService extends Service {
 			return false;
 		}
 		Editor editor = myPreference.edit();
-		editor.putString("Mode", mInterfaceInfo.getConnectMode()==EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL?"manual":"dhcp");
-		LOG("IfName="+ mInterfaceInfo.getIfName());
-		LOG("IP="+ mInterfaceInfo.getIpAddress());
-		LOG("NetMask="+mInterfaceInfo.getNetMask());
-		LOG("GateWay="+ mInterfaceInfo.getGateWay());
-		LOG("DnsAddr="+ mInterfaceInfo.getDnsAddr());
-		LOG("Hwaddr="+ mInterfaceInfo.getHwaddr());
-		editor.putString("IfName", mInterfaceInfo.getIfName());
-		editor.putString("IP", mInterfaceInfo.getIpAddress());
-		editor.putString("NetMask",mInterfaceInfo.getNetMask());
-		editor.putString("GateWay", mInterfaceInfo.getGateWay());
-		editor.putString("DnsAddr", mInterfaceInfo.getDnsAddr());
-		editor.putString("Hwaddr", mInterfaceInfo.getHwaddr());
+		if(mInterfaceInfo.getConnectMode()==EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL){
+			editor.putString("Mode", "manual");
+			editor.putString("IfName", mInterfaceInfo.getIfName());
+			editor.putString("IP", mInterfaceInfo.getIpAddress());
+			editor.putString("NetMask",mInterfaceInfo.getNetMask());
+			editor.putString("GateWay", mInterfaceInfo.getGateWay());
+			editor.putString("DnsAddr", mInterfaceInfo.getDnsAddr());
+			editor.putString("Hwaddr", mInterfaceInfo.getHwaddr());
+		}else{
+			editor.putString("Mode", "dhcp");
+			editor.putString("IfName", mInterfaceInfo.getIfName());
+			editor.putString("IP", SystemProperties.get("dhcp.eth0.ipaddress","0.0.0.0"));
+			editor.putString("NetMask",SystemProperties.get("dhcp.eth0.mask",""));
+			editor.putString("GateWay", SystemProperties.get("dhcp.eth0.gateway",""));
+			editor.putString("DnsAddr", SystemProperties.get("dhcp.eth0.dns1",""));
+			editor.putString("Hwaddr", mInterfaceInfo.getHwaddr());
+		}
+		//LOG("IP-------"+niotonggetIPAddress(true)); //it is other method to get ip address
+		
 		editor.commit();
 		return true;
 	}
