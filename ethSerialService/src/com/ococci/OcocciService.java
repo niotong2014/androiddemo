@@ -85,9 +85,11 @@ public class OcocciService extends Service {
 	
 	SharedPreferences myPreference; 
 
-	private static final boolean DEBUG = true;
+	private static  boolean DEBUG = false;
 	private static final String TAG = "niotongyuan_OcocciService";
-	
+	static{
+		DEBUG = SystemProperties.getBoolean("persist.sys.ococci.debug", false);
+	}
 	private void LOG(String msg){
 		if(DEBUG)
 			Log.d(TAG,msg);
@@ -208,7 +210,7 @@ public class OcocciService extends Service {
 			stmBuffer[9] = 0x20;
 			try {
 				mSTMOutputStream.write(stmBuffer);
-				Thread.sleep(5000);
+				Thread.sleep(1000);
 			}catch (IOException e) {
 				e.printStackTrace();
 				return USBFUNC_NOT_SEND;
