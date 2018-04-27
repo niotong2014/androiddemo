@@ -38,6 +38,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.os.Gpio;
 import android.util.Log;
 
 import com.ococci.SerialPort;
@@ -205,6 +206,74 @@ public class OcocciService extends Service {
 			stmBuffer[4] = (byte) (on?0x1:0x2); //0x1 is on 0x2 is off
 			stmBuffer[5] = 0x0;
 			stmBuffer[6] = 0x0;
+			stmBuffer[7] = 0x0;			
+			stmBuffer[8] = 0x05;
+			stmBuffer[9] = 0x20;
+			try {
+				mSTMOutputStream.write(stmBuffer);
+				Thread.sleep(1000);
+			}catch (IOException e) {
+				e.printStackTrace();
+				return USBFUNC_NOT_SEND;
+			}catch (InterruptedException e){
+				//e.printStackTrace();
+				//LOG("get response from stm!");
+				return stmVal;
+			}		
+			return USBFUNC_NOT_RECIVED;
+		}
+
+		@Override
+		public int isAlive() throws RemoteException {
+			// TODO Auto-generated method stub
+			mSTMWriteThread = Thread.currentThread();
+			byte stmBuffer[] = new byte[10];
+			stmVal = 0;
+			
+			stmBuffer[0] = 0x13;
+			stmBuffer[1] = 0x14;
+			stmBuffer[2] = 0x0;
+			stmBuffer[3] = 0x0;
+			stmBuffer[4] = 0x0;
+			stmBuffer[5] = 0x0;
+			stmBuffer[6] = 0x1;	//isAlive
+			stmBuffer[7] = 0x0;			
+			stmBuffer[8] = 0x05;
+			stmBuffer[9] = 0x20;
+			try {
+				mSTMOutputStream.write(stmBuffer);
+				Thread.sleep(1000);
+			}catch (IOException e) {
+				e.printStackTrace();
+				return USBFUNC_NOT_SEND;
+			}catch (InterruptedException e){
+				//e.printStackTrace();
+				//LOG("get response from stm!");
+				return stmVal;
+			}		
+			return USBFUNC_NOT_RECIVED;
+		}
+
+		@Override
+		public void ledSwitch(boolean on) throws RemoteException {
+			// TODO Auto-generated method stub
+			Gpio.setGpio("PL_9",on?1:0);
+		}
+
+		@Override
+		public int cmdSwitch(boolean on) throws RemoteException {
+			// TODO Auto-generated method stub
+			mSTMWriteThread = Thread.currentThread();
+			byte stmBuffer[] = new byte[10];
+			stmVal = 0;
+			
+			stmBuffer[0] = 0x13;
+			stmBuffer[1] = 0x14;
+			stmBuffer[2] = 0x0;
+			stmBuffer[3] = 0x0;
+			stmBuffer[4] = 0x0;
+			stmBuffer[5] = 0x0;
+			stmBuffer[6] = (byte) (on?0x2:0x3);	//on表示生效单片机会重启android off表示单片机不再重启android
 			stmBuffer[7] = 0x0;			
 			stmBuffer[8] = 0x05;
 			stmBuffer[9] = 0x20;
