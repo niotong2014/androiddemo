@@ -1,0 +1,160 @@
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" 
+    android:orientation="vertical">
+
+   <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/sendText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="text" 
+            android:text="@string/defaultzero">
+
+            <requestFocus />
+        </EditText>
+
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+
+        <TextView
+            android:id="@+id/recvText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/receMsg">
+
+            <requestFocus />
+        </TextView>
+
+    </LinearLayout>
+
+
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+        android:id="@+id/setLowPower"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/setLowPower" />
+    </LinearLayout>
+        
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+        android:id="@+id/ctlAntFoundCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/ctlAntFoundCard" />
+     </LinearLayout>
+     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+        android:id="@+id/setAutoScanID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/setAutoScanID" />
+      </LinearLayout>
+           <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+        android:id="@+id/foundCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/foundCard" />
+      </LinearLayout>
+           <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+        android:id="@+id/readBlock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/readBlock" />
+      </LinearLayout>
+           <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+        android:id="@+id/writeBlock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/writeBlock" />
+      </LinearLayout>
+           <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+        android:id="@+id/initWallet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/initWallet" />
+      </LinearLayout>
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+        android:id="@+id/readWallet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/readWallet" />
+      </LinearLayout>
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+        android:id="@+id/recharge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/recharge" />
+      </LinearLayout>
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+        android:id="@+id/pay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/pay" />
+      </LinearLayout>
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+        android:id="@+id/backupWallet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/backupWallet" />
+      </LinearLayout>
+        
+
+      
+</LinearLayout>

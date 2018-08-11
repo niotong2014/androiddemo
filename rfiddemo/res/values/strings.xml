@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">myjni</string>
+    <string name="action_settings">Settings</string>
+    <string name="plus">"+"</string>
+    <string name="equals">"="</string>
+    <string name="defaultzero"></string>
+    <string name="receMsg">"接收值（16进制）:"</string>
+	<!-- nfc的11项功能 start-->
+    <string name="setLowPower">设置模块为低功耗状态</string>
+    <string name="ctlAntFoundCard">天线和寻卡控制</string>
+    <string name="setAutoScanID">"设置自动扫描ID"</string>
+    <string name="foundCard">"寻卡"</string>
+    <string name="readBlock">"读块"</string>
+    <string name="writeBlock">"写块"</string>
+    <string name="initWallet">"初始化钱包"</string>
+    <string name="readWallet">"读取钱包"</string>
+    <string name="recharge">"充值"</string>
+    <string name="pay">"扣款"</string>
+    <string name="backupWallet">"备份钱包"</string>
+    <!-- nfc的11项功能 end-->
+    <string name="error_configuration">Please configure your serial port first.</string>
+    <string name="error_security">You do not have read/write permission to the serial
+		port.</string>
+    <string name="error_unknown">The serial port can not be opened for an unknown
+		reason.</string>
+
+</resources>
