@@ -1,0 +1,33 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res/com.shiwei.launcher"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+   android:background="@drawable/allapp_background"
+    tools:context=".AllApp"
+    tools:ignore="MergeRootFrame" >
+    <GridView android:layout_width="match_parent"
+        android:id="@+id/apps_list"
+        android:numColumns="5"
+        android:gravity="center"
+        android:layout_height="wrap_content">
+    </GridView>
+    <!-- 
+       <com.shiwei.launcher.BatteryView
+           android:id="@+id/horizontalBattery"
+           android:layout_width="30dp"
+           android:layout_height="14dp"
+           android:layout_alignParentBottom="true"
+           android:layout_alignParentRight="true"
+           android:layout_marginBottom="15dp"
+           android:layout_marginRight="20dp"
+           android:background="#fff"
+           android:gravity="center"
+           app:batteryColor="@android:color/black"
+           app:batteryOrientation="horizontal"
+           app:batteryPower="70" />
+	 -->
+
+</RelativeLayout>
+<!--  android:background="#FFFFFF"  -->

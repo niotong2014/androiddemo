@@ -1,0 +1,24 @@
+<resources>
+
+    <!--
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    -->
+    <style name="AppBase0Theme" parent="android:Theme.NoTitleBar.Fullscreen"></style> 
+    <style name="AppBase1Theme" parent="android:Theme.Translucent.NoTitleBar.Fullscreen"></style>
+    <style name="AppBase2Theme" parent="android:Theme.Light.NoTitleBar"></style>
+    <style name="AppBase3Theme" parent="android:Theme.Black.NoTitleBar"></style>
+    <style name="AppBase4Theme" parent="android:Theme.Translucent.NoTitleBar"></style>
+    
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+    
+
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBase0Theme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+</resources>

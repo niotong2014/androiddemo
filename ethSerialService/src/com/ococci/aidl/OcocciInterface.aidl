@@ -5,4 +5,5 @@ interface OcocciInterface{
 	int isAlive();
 	void ledSwitch(boolean on);
 	int cmdSwitch(boolean on);
+	int powerCTL(int num,boolean on);
 }

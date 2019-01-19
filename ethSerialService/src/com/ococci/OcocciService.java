@@ -290,6 +290,53 @@ public class OcocciService extends Service {
 			}		
 			return USBFUNC_NOT_RECIVED;
 		}
+
+		@Override
+		public int powerCTL(int num, boolean on) throws RemoteException {
+			// TODO Auto-generated method stub
+			mSTMWriteThread = Thread.currentThread();
+			byte stmBuffer[] = new byte[10];
+			byte val  = 0x0;
+			stmVal = 0;
+			//on为开关
+			switch(num){
+			case 0:
+				val = (byte)(on?0x4:0x5);
+				break;
+			case 1:
+				val = (byte)(on?0x6:0x7);
+				break;
+			case 2:
+				val = (byte)(on?0x8:0x9);
+				break;
+			case 3:
+				val = (byte)(on?0xa:0xb);
+				break;
+			}
+			
+			stmBuffer[0] = 0x13;
+			stmBuffer[1] = 0x14;
+			stmBuffer[2] = 0x0;
+			stmBuffer[3] = 0x0;
+			stmBuffer[4] = 0x0;
+			stmBuffer[5] = 0x0;
+			stmBuffer[6] = val;
+			stmBuffer[7] = 0x0;			
+			stmBuffer[8] = 0x05;
+			stmBuffer[9] = 0x20;
+			try {
+				mSTMOutputStream.write(stmBuffer);
+				Thread.sleep(1000);
+			}catch (IOException e) {
+				e.printStackTrace();
+				return USBFUNC_NOT_SEND;
+			}catch (InterruptedException e){
+				//e.printStackTrace();
+				//LOG("get response from stm!");
+				return stmVal;
+			}		
+			return USBFUNC_NOT_RECIVED;
+		}
 	};
 
 	private class PCReadThread extends Thread {

@@ -43,7 +43,9 @@ public class MainActivity extends Activity{
 	OcocciInterface mService;
 	IntentFilter filter;
 	private static final int CMD_TIME = 10000;
+	private static final int LED_CMD_TIME = 500;
 	Handler handler = new Handler();
+	Handler ledhandler = new Handler();
 	private static boolean LED_KEY = false;
 	
 	private static final String TAG = "niotongyuan_ethSerialClient";
@@ -105,7 +107,17 @@ public class MainActivity extends Activity{
 			} 
 */
 			//handler.postDelayed(runnable, CMD_TIME);
+			try {
+				mService.powerCTL(0,true);	//open DC1
+				mService.powerCTL(1,true);	//open DC2
+				mService.powerCTL(2,true);	//open DC3
+				mService.powerCTL(3,true);	//open DC4
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			handler.post(runnable);
+			ledhandler.post(ledrunnable);
 		}
 	};
 	
@@ -117,6 +129,22 @@ public class MainActivity extends Activity{
 			try {
 				if(mService != null){
 					mService.isAlive();
+				}
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			handler.postDelayed(this, CMD_TIME);
+		}
+		
+	};
+	Runnable ledrunnable = new Runnable(){
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			try {
+				if(mService != null){
 					LED_KEY = !LED_KEY;
 					mService.ledSwitch(LED_KEY);
 				}
@@ -124,7 +152,7 @@ public class MainActivity extends Activity{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			handler.postDelayed(this, CMD_TIME);
+			ledhandler.postDelayed(this, LED_CMD_TIME);
 		}
 		
 	};

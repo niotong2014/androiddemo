@@ -18,7 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.niotong.tester.R;
+import com.ococci.R;
 import com.ococci.SerialPort;
 
 public class MainActivity extends Activity implements OnClickListener{
