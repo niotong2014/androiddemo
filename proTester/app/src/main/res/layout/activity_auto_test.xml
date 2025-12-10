@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".AutoTestActivity">
+
+    <TextView
+        android:id="@+id/tv_title"
+        style="@style/TitleTextViewStyle"
+        android:text="@string/title_auto_test" />
+
+    <TextView
+        android:id="@+id/tv_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:padding="12dp"
+        android:background="@color/primary_light"
+        android:textColor="@color/primary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        tools:text="进度: 0/12 (0.0%)" />
+
+    <TextView
+        android:id="@+id/tv_current_test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:padding="12dp"
+        android:background="@color/card_background"
+        android:textColor="@color/primary_text"
+        android:textSize="16sp"
+        android:text="准备开始自动测试"
+        android:gravity="center"
+        android:drawablePadding="8dp" />
+
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:padding="12dp"
+        android:background="@color/status_idle"
+        android:textColor="@color/primary_text"
+        android:textSize="16sp"
+        android:text="状态: 待测试"
+        android:gravity="center"
+        android:drawablePadding="8dp" />
+
+    <Button
+        android:id="@+id/btn_start_stop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/btn_start_test"
+        style="@style/TestButtonStyle"
+        android:backgroundTint="@color/primary" />
+
+    <Button
+        android:id="@+id/btn_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/btn_back"
+        style="@style/TestButtonStyle"
+        android:backgroundTint="@color/accent" />
+
+</LinearLayout>

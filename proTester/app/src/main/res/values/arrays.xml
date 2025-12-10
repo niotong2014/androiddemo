@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="test_item_names">
+        <item>MIC测试</item>
+        <item>喇叭测试</item>
+        <item>显示屏测试</item>
+        <item>WiFi测试</item>
+        <item>蓝牙测试</item>
+        <item>GPIO测试</item>
+        <item>SD卡测试</item>
+        <item>HDMI测试</item>
+        <item>USB测试</item>
+        <item>以太网测试</item>
+        <item>串口测试</item>
+        <item>ADC按键测试</item>
+    </string-array>
+
+    <string-array name="test_item_descriptions">
+        <item>请对着MIC说话，检查录音是否正常</item>
+        <item>检查喇叭是否能正常播放声音</item>
+        <item>检查显示屏显示是否正常</item>
+        <item>检查WiFi连接是否正常</item>
+        <item>检查蓝牙功能是否正常</item>
+        <item>检查GPIO引脚功能是否正常</item>
+        <item>检查SD卡读写是否正常</item>
+        <item>检查HDMI输出是否正常</item>
+        <item>检查USB功能是否正常</item>
+        <item>检查以太网连接是否正常</item>
+        <item>检查串口通信是否正常</item>
+        <item>检查ADC按键是否正常</item>
+    </string-array>
+</resources>

@@ -1,0 +1,89 @@
+{
+  "auto_test_enabled": true,
+  "test_items": [
+    {
+      "id": "mic",
+      "name": "MIC测试",
+      "description": "请对着MIC说话，检查录音是否正常",
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": "speaker",
+      "name": "喇叭测试",
+      "description": "检查喇叭是否能正常播放声音",
+      "enabled": true,
+      "order": 2
+    },
+    {
+      "id": "display",
+      "name": "显示屏测试",
+      "description": "检查显示屏显示是否正常",
+      "enabled": true,
+      "order": 3
+    },
+    {
+      "id": "wifi",
+      "name": "WiFi测试",
+      "description": "检查WiFi连接是否正常",
+      "enabled": true,
+      "order": 4
+    },
+    {
+      "id": "bluetooth",
+      "name": "蓝牙测试",
+      "description": "检查蓝牙功能是否正常",
+      "enabled": true,
+      "order": 5
+    },
+    {
+      "id": "gpio",
+      "name": "GPIO测试",
+      "description": "检查GPIO引脚功能是否正常",
+      "enabled": true,
+      "order": 6
+    },
+    {
+      "id": "sdcard",
+      "name": "SD卡测试",
+      "description": "检查SD卡读写是否正常",
+      "enabled": true,
+      "order": 7
+    },
+    {
+      "id": "hdmi",
+      "name": "HDMI测试",
+      "description": "检查HDMI输出是否正常",
+      "enabled": true,
+      "order": 8
+    },
+    {
+      "id": "usb",
+      "name": "USB测试",
+      "description": "检查USB功能是否正常",
+      "enabled": true,
+      "order": 9
+    },
+    {
+      "id": "ethernet",
+      "name": "以太网测试",
+      "description": "检查以太网连接是否正常",
+      "enabled": true,
+      "order": 10
+    },
+    {
+      "id": "uart",
+      "name": "串口测试",
+      "description": "检查串口通信是否正常",
+      "enabled": true,
+      "order": 11
+    },
+    {
+      "id": "adc",
+      "name": "ADC按键测试",
+      "description": "检查ADC按键是否正常",
+      "enabled": true,
+      "order": 12
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">设备出厂测试</string>
+    <string name="title_main">主界面</string>
+    <string name="title_auto_test">自动测试</string>
+    <string name="title_test_results">测试结果</string>
+    <string name="btn_auto_test">自动测试</string>
+    <string name="btn_test_results">查看结果</string>
+    <string name="btn_start_test">开始测试</string>
+    <string name="btn_stop_test">停止测试</string>
+    <string name="btn_back">返回</string>
+    <string name="btn_pass">通过</string>
+    <string name="btn_fail">失败</string>
+    <string name="btn_skip">跳过</string>
+    <string name="status_idle">待测试</string>
+    <string name="status_testing">测试中</string>
+    <string name="status_pass">通过</string>
+    <string name="status_fail">失败</string>
+    <string name="status_skip">跳过</string>
+    <string name="test_completed">测试完成</string>
+    <string name="test_stopped">测试已停止</string>
+    <string name="save_success">结果保存成功</string>
+    <string name="save_failed">结果保存失败</string>
+    <string name="json_config">test_config.json</string>
+    <string name="results_json">test_results.json</string>
+    <string name="results_xml">test_results.xml</string>
+
+    <!-- 测试项目名称 -->
+    <string name="test_mic">MIC测试</string>
+    <string name="test_speaker">喇叭测试</string>
+    <string name="test_display">显示屏测试</string>
+    <string name="test_wifi">WiFi测试</string>
+    <string name="test_bluetooth">蓝牙测试</string>
+    <string name="test_gpio">GPIO测试</string>
+    <string name="test_sdcard">SD卡测试</string>
+    <string name="test_hdmi">HDMI测试</string>
+    <string name="test_usb">USB测试</string>
+    <string name="test_ethernet">以太网测试</string>
+    <string name="test_uart">串口测试</string>
+    <string name="test_adc">ADC按键测试</string>
+
+    <!-- 测试说明 -->
+    <string name="desc_mic">请对着MIC说话，检查录音是否正常</string>
+    <string name="desc_speaker">检查喇叭是否能正常播放声音</string>
+    <string name="desc_display">检查显示屏显示是否正常</string>
+    <string name="desc_wifi">检查WiFi连接是否正常</string>
+    <string name="desc_bluetooth">检查蓝牙功能是否正常</string>
+    <string name="desc_gpio">检查GPIO引脚功能是否正常</string>
+    <string name="desc_sdcard">检查SD卡读写是否正常</string>
+    <string name="desc_hdmi">检查HDMI输出是否正常</string>
+    <string name="desc_usb">检查USB功能是否正常</string>
+    <string name="desc_ethernet">检查以太网连接是否正常</string>
+    <string name="desc_uart">检查串口通信是否正常</string>
+    <string name="desc_adc">检查ADC按键是否正常</string>
+</resources>

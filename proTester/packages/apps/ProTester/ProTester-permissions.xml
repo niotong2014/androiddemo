@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+    <privapp-permissions package="com.example.protester">
+        <!-- 硬件测试权限 -->
+        <permission name="android.permission.RECORD_AUDIO" />
+        <permission name="android.permission.MODIFY_AUDIO_SETTINGS" />
+        <permission name="android.permission.INTERNET" />
+        <permission name="android.permission.ACCESS_NETWORK_STATE" />
+        <permission name="android.permission.ACCESS_WIFI_STATE" />
+        <permission name="android.permission.CHANGE_WIFI_STATE" />
+        <permission name="android.permission.BLUETOOTH" />
+        <permission name="android.permission.BLUETOOTH_ADMIN" />
+        <permission name="android.permission.BLUETOOTH_SCAN" />
+        <permission name="android.permission.BLUETOOTH_CONNECT" />
+        <permission name="android.permission.ACCESS_FINE_LOCATION" />
+        <permission name="android.permission.READ_EXTERNAL_STORAGE" />
+        <permission name="android.permission.WRITE_EXTERNAL_STORAGE" />
+        <permission name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+        <permission name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+        <!-- 系统应用特权权限 -->
+        <permission name="android.permission.INSTALL_PACKAGES" />
+        <permission name="android.permission.DELETE_PACKAGES" />
+        <permission name="android.permission.ACCESS_MOCK_LOCATION" />
+        <permission name="android.permission.WRITE_SECURE_SETTINGS" />
+
+        <!-- 调试权限 -->
+        <permission name="android.permission.DEBUG" />
+        <permission name="android.permission.WRITE_APEX" />
+
+        <!-- 硬件访问权限 -->
+        <permission name="android.permission.HARDWARE_TEST" />
+        <permission name="android.permission.ACCESS_SURFACE_FLINGER" />
+
+        <!-- 开发者选项权限 -->
+        <permission name="android.permission.ACCESSIBILITY_SERVICE" />
+        <permission name="android.permission.READ_LOGS" />
+    </privapp-permissions>
+
+    <!-- 自定义权限 -->
+    <permission name="com.example.protester.permission.READ_TEST_RESULTS"
+                label="Read test results"
+                description="Allows reading test results"
+                protectionLevel="signature" />
+
+    <permission name="com.example.protester.permission.WRITE_TEST_RESULTS"
+                label="Write test results"
+                description="Allows writing test results"
+                protectionLevel="signature" />
+
+    <permission name="com.example.protester.permission.RUN_HARDWARE_TESTS"
+                label="Run hardware tests"
+                description="Allows running hardware tests"
+                protectionLevel="signature" />
+</permissions>

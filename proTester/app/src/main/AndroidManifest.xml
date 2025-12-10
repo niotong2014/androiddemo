@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- 硬件测试权限 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- 系统应用权限 -->
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.DELETE_PACKAGES" />
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+
+    <!-- 调试相关权限 -->
+    <uses-permission android:name="android.permission.DEBUG" />
+    <uses-permission android:name="android.permission.WRITE_APEX" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.ProTester"
+        android:usesCleartextTraffic="true"
+        android:debuggable="true"
+        android:allowTest="true"
+        android:allowClearUserData="true"
+        android:allowTaskReparenting="true"
+        android:configChanges="keyboard|keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|uiMode"
+        android:hardwareAccelerated="true"
+        android:killAfterRestore="false"
+        android:restoreAnyVersion="true"
+        android:stateNotNeeded="true"
+        android:vmSafeMode="true"
+        android:extractNativeLibs="true"
+        android:largeHeap="true">
+
+        <!-- 主界面 -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity="com.example.protester"
+            android:clearTaskOnLaunch="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 测试结果界面 -->
+        <activity
+            android:name=".TestResultsActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+        <!-- 自动测试界面 -->
+        <activity
+            android:name=".AutoTestActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+        <!-- MIC测试 -->
+        <activity
+            android:name=".MicTestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- 喇叭测试 -->
+        <activity
+            android:name=".SpeakerTestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- 显示屏测试 -->
+        <activity
+            android:name=".DisplayTestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- WiFi测试 -->
+        <activity
+            android:name=".WiFiTestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- 蓝牙测试 -->
+        <activity
+            android:name=".BluetoothTestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- GPIO测试 -->
+        <activity
+            android:name=".GpioTestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- SD卡测试 -->
+        <activity
+            android:name=".SdCardTestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- HDMI测试 -->
+        <activity
+            android:name=".HdmiTestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- USB测试 -->
+        <activity
+            android:name=".UsbTestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- 以太网测试 -->
+        <activity
+            android:name=".EthernetTestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- 串口测试 -->
+        <activity
+            android:name=".UartTestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- ADC按键测试 -->
+        <activity
+            android:name=".AdcTestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- 服务 -->
+        <service
+            android:name=".TestResultService"
+            android:exported="false"
+            android:process=":remote" />
+
+        <!-- 提供者 -->
+        <provider
+            android:name=".TestResultProvider"
+            android:authorities="com.example.protester.provider"
+            android:exported="false"
+            android:grantUriPermissions="true" />
+
+    </application>
+
+</manifest>

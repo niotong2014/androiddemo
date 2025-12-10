@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/TestCardStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tv_test_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary_text"
+                tools:text="测试项目名称" />
+
+            <TextView
+                android:id="@+id/tv_status"
+                style="@style/StatusTextViewStyle"
+                android:text="@string/status_idle"
+                android:textColor="@color/status_idle"
+                tools:text="@string/status_idle" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_test_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/secondary_text"
+            android:layout_marginBottom="12dp"
+            tools:text="测试说明描述" />
+
+        <Button
+            android:id="@+id/btn_start_test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_start_test"
+            style="@style/TestButtonStyle"
+            android:backgroundTint="@color/primary" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
